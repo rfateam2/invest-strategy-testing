@@ -1,4 +1,4 @@
-# python test_advince_psar.py QQQ 100 2024-01-01 --end_date 2024-12-31
+# python test_advince_psar_d.py QQQ 100 2024-01-01 --end_date 2024-12-31
 
 import yfinance as yf
 import ta

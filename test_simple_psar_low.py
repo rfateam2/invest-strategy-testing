@@ -181,7 +181,7 @@ def main():
     simple_end_value = simple_values[-1] if simple_values else 0
     simple_roi = calculate_roi(0, simple_end_value, simple_invested)
 
-    print(f"\n=== Простая стратегия. Покупка выше PSAR ===")
+    print(f"\n=== Простая стратегия. Недельный PSAR выше цены покупки. ===")
     print(f"Общая сумма вложений: ${simple_invested:.2f}")
     print(f"Итоговая стоимость портфеля: ${simple_end_value:.2f}")
     print(f"Итоговая прибыль: ${simple_end_value - simple_invested:.2f}")

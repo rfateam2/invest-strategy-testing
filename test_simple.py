@@ -88,8 +88,10 @@ def main():
 
     # Вывод краткого отчета в терминал
     print(f"\n=== Простая стратегия ===")
+    print(f"Сумма недельного пополнения: ${args.weekly_investment:.2f}")
     print(f"Общая сумма вложений: ${simple_invested:.2f}")
     print(f"Итоговая стоимость портфеля: ${simple_end_value:.2f}")
+    print(f"Итоговая прибыль: ${simple_end_value - simple_invested:.2f}")
     print(f"Максимальная просадка: {simple_drawdown * 100:.2f}%")
     print(f"ROI: {simple_roi * 100:.2f}%")
     print(f"CAGR: {simple_cagr * 100:.2f}%\n")
@@ -98,8 +100,10 @@ def main():
     report_path = os.path.join(os.getcwd(), "report.txt")
     with open(report_path, "w") as report_file:
         report_file.write(f"=== Простая стратегия ===\n")
+        report_file.write(f"Сумма стандартного недельного пополнения: ${args.weekly_investment:.2f}\n")
         report_file.write(f"Общая сумма вложений: ${simple_invested:.2f}\n")
         report_file.write(f"Итоговая стоимость портфеля: ${simple_end_value:.2f}\n")
+        report_file.write(f"Итоговая прибыль: ${simple_end_value - simple_invested:.2f}\n")        
         report_file.write(f"Максимальная просадка: {simple_drawdown * 100:.2f}%\n")
         report_file.write(f"ROI: {simple_roi * 100:.2f}%\n")
         report_file.write(f"CAGR: {simple_cagr * 100:.2f}%\n\n")

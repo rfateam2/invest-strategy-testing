@@ -3,10 +3,6 @@
 # pip install yfinance pandas numpy matplotlib
 # python test_advince_multiplier.py QQQ 100 2024-01-01 --end_date 2024-12-31 --multiplier 0
 
-# - Если цена падает на -10% от последнего максимума, покупаем на сумму равную сумме еженедельного пополнения умноженным на multiplier
-# - Если цена падает на -20% от последнего максимума, покупаем на сумму равную сумме еженедельного предыдущего пополнения умноженной на multiplier
-# - Если цена падает на -30% от последнего максимума, покупаем на сумму равную сумме еженедельного предыдущего пополнения умноженной на multiplier
-
 import yfinance as yf
 import pandas as pd
 import numpy as np

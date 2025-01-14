@@ -1,7 +1,7 @@
 # python3 -m venv path/to/venv                                                                                     
 # source path/to/venv/bin/activate
 # pip install yfinance pandas numpy matplotlib
-# python test_advince_dvd.py QQQ 1000 2024-01-01 --end_date 2024-12-31
+# python test_advince_dvd.py QQQ 100 2024-01-01 --end_date 2024-12-31
 
 import yfinance as yf
 import pandas as pd

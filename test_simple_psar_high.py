@@ -1,4 +1,4 @@
-# python test_simple_psar_high.py QQQ 100 2024-01-01 --end_date 2024-12-31
+# python test_simple_psar_high.py QQQ 100 2023-01-01 --end_date 2024-12-31
 
 import yfinance as yf
 import pandas as pd

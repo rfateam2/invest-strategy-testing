@@ -181,6 +181,11 @@ def main():
     simple_end_value = simple_values[-1] if simple_values else 0
     simple_roi = calculate_roi(0, simple_end_value, simple_invested)
 
+    print(f"\n=== Входные данные ===")
+    print(f"Тикер: {args.ticker}")
+    print(f"Сумма стандартного недельного пополнения: ${args.weekly_investment:.2f}")
+    print(f"Период: с {args.start_date} по {args.end_date}")
+
     print(f"\n=== Простая стратегия. Недельный PSAR ниже цены покупки. ===")
     print(f"Общая сумма вложений: ${simple_invested:.2f}")
     print(f"Итоговая стоимость портфеля: ${simple_end_value:.2f}")

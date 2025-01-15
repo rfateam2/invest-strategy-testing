@@ -1,7 +1,7 @@
 # python3 -m venv path/to/venv                                                                                     
 # source path/to/venv/bin/activate
 # pip install yfinance pandas numpy matplotlib
-# python test_advince_dvd.py QQQ 100 2024-01-01 --end_date 2024-12-31
+# python test_advince_dvd_1.py QQQ 100 2024-01-01 --end_date 2024-12-31
 
 import yfinance as yf
 import pandas as pd
@@ -81,26 +81,35 @@ def calculate_drawdown(portfolio_value):
 def calculate_roi(start_value, end_value, total_invested):
     return (end_value - total_invested) / total_invested if total_invested > 0 else 0
 
-def plot_results(data, simple_values, test_values, simple_monthly, test_monthly):
+def plot_results(data, simple_values, test_values, simple_monthly, test_monthly, simple_invested, test_invested):
     simple_monthly_totals = simple_monthly.groupby("YearMonth")["Investment"].sum().reset_index()
     simple_monthly_totals["YearMonth"] = pd.to_datetime(simple_monthly_totals["YearMonth"])
 
     test_monthly_totals = test_monthly.groupby("YearMonth")["Investment"].sum().reset_index()
     test_monthly_totals["YearMonth"] = pd.to_datetime(test_monthly_totals["YearMonth"])
 
+    # Расчёт вложенных средств для отображения на графике
+    simple_cumulative_investment = simple_monthly_totals["Investment"].cumsum()
+    test_cumulative_investment = test_monthly_totals["Investment"].cumsum()
+
     plt.figure(figsize=(14, 7))
-    # plt.xticks(rotation=45)
-    # plt.tight_layout()
-    plt.plot(data["Date"], simple_values, label="Простая стратегия: Стоимость портфеля")
-    plt.plot(data["Date"], test_values, label="Тестируемая стратегия: Стоимость портфеля")
+    plt.plot(data["Date"], simple_values, label="Простая стратегия: Стоимость портфеля", color="blue")
+    plt.plot(data["Date"], test_values, label="Тестируемая стратегия: Стоимость портфеля", color="orange")
     plt.bar(test_monthly_totals["YearMonth"], test_monthly_totals["Investment"], width=20, alpha=0.3, label="Тестируемая стратегия: Пополнения", color="orange")
+
+    # Добавление кривых вложенных средств
+    plt.plot(data["Date"], np.interp(data["Date"], simple_monthly_totals["YearMonth"], simple_cumulative_investment),
+             label="Простая стратегия: Вложенные средства", color="blue", linestyle="--", alpha=0.5)
+    plt.plot(data["Date"], np.interp(data["Date"], test_monthly_totals["YearMonth"], test_cumulative_investment),
+             label="Тестируемая стратегия: Вложенные средства", color="orange", linestyle="--", alpha=0.5)
+
     plt.title("Динамика стоимости портфеля и пополнений")
     plt.xlabel("Дата")
     plt.ylabel("Доллары ($)")
     plt.legend()
     plt.grid()
     plt.show()
-    # plt.savefig("portfolio_performance.png")
+
 
 def load_dividend_data(ticker, start_date, end_date):
     """Загрузка данных о дивидендах для тикера."""
@@ -117,19 +126,15 @@ def apply_dividend_reinvestment(data, dividends, total_units):
     for _, row in dividends.iterrows():
         dividend_date = row["Date"]
         dividend_amount = row["Dividends"]
-
         # Найти цену закрытия в дату выплаты дивиденда
         close_price = data.loc[data["Date"] == dividend_date, "Close"]
         if not close_price.empty:
             close_price = close_price.iloc[0]
-
             # Расчёт количества новых акций, купленных на сумму дивидендов
             dividend_investment = total_units * dividend_amount
             new_units = dividend_investment / close_price
-
             # Обновление общего количества акций
             total_units += new_units
-
     return total_units
 
 def main():
@@ -173,8 +178,12 @@ def main():
     test_cagr = (1 + test_roi) ** (1 / ((datetime.fromisoformat(args.end_date) - datetime.fromisoformat(args.start_date)).days / 365)) - 1
 
     # Вывод результатов в консоль
-    print(f"\n=== Простая стратегия ===")
+    print(f"\n=== Входные данные ===")
+    print(f"Тикер: {args.ticker}")
     print(f"Сумма стандартного недельного пополнения: ${args.weekly_investment:.2f}")
+    print(f"Период: с {args.start_date} по {args.end_date}")
+
+    print(f"\n=== Простая стратегия ===")
     print(f"Общая сумма вложений: ${simple_invested:.2f}")
     print(f"Итоговая стоимость портфеля: ${simple_end_value:.2f}")
     print(f"Итоговая стоимость портфеля (с дивидендами): ${simple_end_value_with_dividends:.2f}")
@@ -184,7 +193,6 @@ def main():
     print(f"CAGR: {simple_cagr * 100:.2f}%\n")
 
     print(f"=== Тестируемая стратегия ===")
-    print(f"Сумма стандартного недельного пополнения: ${args.weekly_investment:.2f}")
     print(f"Общая сумма вложений: ${test_invested:.2f}")
     print(f"Итоговая стоимость портфеля: ${test_end_value:.2f}")
     print(f"Итоговая стоимость портфеля (с дивидендами): ${test_end_value_with_dividends:.2f}")
@@ -221,7 +229,7 @@ def main():
 
     print(f"Полный отчёт сохранён в файл: {report_path}")
 
-    plot_results(data, simple_values, test_values, simple_monthly, test_monthly)
+    plot_results(data, simple_values, test_values, simple_monthly, test_monthly, simple_invested, test_invested)
 
 if __name__ == "__main__":
     main()

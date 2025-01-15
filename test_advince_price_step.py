@@ -130,6 +130,11 @@ def main():
     test_cagr = (1 + test_roi) ** (1 / ((datetime.fromisoformat(args.end_date) - datetime.fromisoformat(args.start_date)).days / 365)) - 1
 
     # Вывод краткого отчета в терминал
+    print(f"\n=== Входные данные ===")
+    print(f"Тикер: {args.ticker}")
+    print(f"Сумма стандартного недельного пополнения: ${args.weekly_investment:.2f}")
+    print(f"Период: с {args.start_date} по {args.end_date}")
+    
     print(f"\n=== Простая стратегия ===")
     print(f"Общая сумма вложений: ${simple_invested:.2f}")
     print(f"Итоговая стоимость портфеля: ${simple_end_value:.2f}")

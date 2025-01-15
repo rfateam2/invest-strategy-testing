@@ -150,6 +150,7 @@ def main():
     print(f"CAGR: {simple_cagr * 100:.2f}%\n")
 
     print(f"=== Тестируемая стратегия ===")
+    print(f"Множитель: {args.multiplier:.2f}")
     print(f"Общая сумма вложений: ${test_invested:.2f}")
     print(f"Итоговая стоимость портфеля: ${test_end_value:.2f}")
     print(f"Итоговая прибыль: ${test_end_value - test_invested:.2f}")

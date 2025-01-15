@@ -31,10 +31,11 @@
 Тикер QQQ. Начало инвистиций 1 января 2024 года по конец декабря 2024 года.
 Покупаем каждую пятницу на $100, по цене закрытия дня.
 
+### Как запустить скрипт
 ```
 python3 -m venv path/to/venv                                                                                     
 source path/to/venv/bin/activate
-pip install yfinance pandas numpy matplotlib
+pip install yfinance pandas numpy matplotlib ta
 python test_simple.py QQQ 100 2024-01-01 --end_date 2024-12-31
 ```
 

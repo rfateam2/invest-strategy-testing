@@ -1,7 +1,7 @@
 # python3 -m venv path/to/venv                                                                                     
 # source path/to/venv/bin/activate
 # pip install yfinance pandas numpy matplotlib
-# python test_advince_dvd_1.py QQQ 100 2024-01-01 --end_date 2024-12-31
+# python test_advince_dvd.py QQQ 100 2024-01-01 --end_date 2024-12-31
 
 import yfinance as yf
 import pandas as pd
@@ -121,21 +121,56 @@ def load_dividend_data(ticker, start_date, end_date):
     else:
         return pd.DataFrame(columns=["Date", "Dividends"])
 
+# def apply_dividend_reinvestment(data, dividends, total_units):
+#     """Реинвестирование дивидендов."""
+#     for _, row in dividends.iterrows():
+#         dividend_date = row["Date"]
+#         dividend_amount = row["Dividends"]
+#         # Найти цену закрытия в дату выплаты дивиденда
+#         close_price = data.loc[data["Date"] == dividend_date, "Close"]
+#         if not close_price.empty:
+#             close_price = close_price.iloc[0]
+#             # Расчёт количества новых акций, купленных на сумму дивидендов
+#             dividend_investment = total_units * dividend_amount
+#             new_units = dividend_investment / close_price
+#             # Обновление общего количества акций
+#             total_units += new_units
+#     return total_units
+
 def apply_dividend_reinvestment(data, dividends, total_units):
-    """Реинвестирование дивидендов."""
+    dividend_logs = []
+
     for _, row in dividends.iterrows():
         dividend_date = row["Date"]
         dividend_amount = row["Dividends"]
+        
         # Найти цену закрытия в дату выплаты дивиденда
         close_price = data.loc[data["Date"] == dividend_date, "Close"]
-        if not close_price.empty:
-            close_price = close_price.iloc[0]
-            # Расчёт количества новых акций, купленных на сумму дивидендов
-            dividend_investment = total_units * dividend_amount
-            new_units = dividend_investment / close_price
-            # Обновление общего количества акций
-            total_units += new_units
-    return total_units
+        if close_price.empty:
+            print(f"Пропущена дата: {dividend_date} (нет данных о цене закрытия)")
+            continue
+
+        close_price = close_price.iloc[0]
+
+        # Расчёт количества новых акций, купленных на сумму дивидендов
+        dividend_investment = total_units * dividend_amount
+        new_units = dividend_investment / close_price
+
+        dividend_logs.append({
+            "Date": dividend_date,
+            "Dividend_Per_Share": dividend_amount,
+            "Close_Price": close_price,
+            "Total_Units_Before": total_units,
+            "Dividend_Investment": dividend_investment,
+            "New_Units": new_units
+        })
+
+        total_units += new_units
+
+    return total_units, pd.DataFrame(dividend_logs)
+
+
+
 
 def main():
     parser = argparse.ArgumentParser(description="Тестирование инвестиционных стратегий.")
@@ -157,12 +192,29 @@ def main():
 
     # Реинвестирование дивидендов
     total_units_simple = simple_invested / data["Close"].iloc[0]
-    total_units_simple = apply_dividend_reinvestment(data, dividends, total_units_simple)
+    total_units_simple, simple_dividend_logs = apply_dividend_reinvestment(data, dividends, total_units_simple)
     simple_end_value_with_dividends = total_units_simple * data["Close"].iloc[-1]
 
     total_units_test = test_invested / data["Close"].iloc[0]
-    total_units_test = apply_dividend_reinvestment(data, dividends, total_units_test)
+    total_units_test, test_dividend_logs = apply_dividend_reinvestment(data, dividends, total_units_test)
     test_end_value_with_dividends = total_units_test * data["Close"].iloc[-1]
+
+    # Вывод данных о дивидендах
+    print("\n=== Лог дивидендов для простой стратегии ===")
+    print(simple_dividend_logs)
+
+    print("\n=== Лог дивидендов для тестируемой стратегии ===")
+    print(test_dividend_logs)
+
+
+    # # Реинвестирование дивидендов
+    # total_units_simple = simple_invested / data["Close"].iloc[0]
+    # total_units_simple = apply_dividend_reinvestment(data, dividends, total_units_simple)
+    # simple_end_value_with_dividends = total_units_simple * data["Close"].iloc[-1]
+
+    # total_units_test = test_invested / data["Close"].iloc[0]
+    # total_units_test = apply_dividend_reinvestment(data, dividends, total_units_test)
+    # test_end_value_with_dividends = total_units_test * data["Close"].iloc[-1]
 
     # Вычисление метрик
     simple_drawdown = calculate_drawdown(simple_values)
@@ -178,12 +230,8 @@ def main():
     test_cagr = (1 + test_roi) ** (1 / ((datetime.fromisoformat(args.end_date) - datetime.fromisoformat(args.start_date)).days / 365)) - 1
 
     # Вывод результатов в консоль
-    print(f"\n=== Входные данные ===")
-    print(f"Тикер: {args.ticker}")
-    print(f"Сумма стандартного недельного пополнения: ${args.weekly_investment:.2f}")
-    print(f"Период: с {args.start_date} по {args.end_date}")
-
     print(f"\n=== Простая стратегия ===")
+    print(f"Сумма стандартного недельного пополнения: ${args.weekly_investment:.2f}")
     print(f"Общая сумма вложений: ${simple_invested:.2f}")
     print(f"Итоговая стоимость портфеля: ${simple_end_value:.2f}")
     print(f"Итоговая стоимость портфеля (с дивидендами): ${simple_end_value_with_dividends:.2f}")
@@ -193,6 +241,7 @@ def main():
     print(f"CAGR: {simple_cagr * 100:.2f}%\n")
 
     print(f"=== Тестируемая стратегия ===")
+    print(f"Сумма стандартного недельного пополнения: ${args.weekly_investment:.2f}")
     print(f"Общая сумма вложений: ${test_invested:.2f}")
     print(f"Итоговая стоимость портфеля: ${test_end_value:.2f}")
     print(f"Итоговая стоимость портфеля (с дивидендами): ${test_end_value_with_dividends:.2f}")

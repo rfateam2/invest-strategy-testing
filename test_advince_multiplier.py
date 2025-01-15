@@ -1,6 +1,3 @@
-# python3 -m venv path/to/venv                                                                                     
-# source path/to/venv/bin/activate
-# pip install yfinance pandas numpy matplotlib
 # python test_advince_multiplier.py QQQ 100 2024-01-01 --end_date 2024-12-31 --multiplier 0
 
 import yfinance as yf
@@ -87,13 +84,20 @@ def plot_results(data, simple_values, test_values, simple_monthly, test_monthly)
 
     test_monthly_totals = test_monthly.groupby("YearMonth")["Investment"].sum().reset_index()
     test_monthly_totals["YearMonth"] = pd.to_datetime(test_monthly_totals["YearMonth"])
-
+    # Расчёт вложенных средств для отображения на графике
+    simple_cumulative_investment = simple_monthly_totals["Investment"].cumsum()
+    test_cumulative_investment = test_monthly_totals["Investment"].cumsum()
     plt.figure(figsize=(14, 7))
     # plt.xticks(rotation=45)
     # plt.tight_layout()
     plt.plot(data["Date"], simple_values, label="Простая стратегия: Стоимость портфеля")
     plt.plot(data["Date"], test_values, label="Тестируемая стратегия: Стоимость портфеля")
     plt.bar(test_monthly_totals["YearMonth"], test_monthly_totals["Investment"], width=20, alpha=0.3, label="Тестируемая стратегия: Пополнения", color="orange")
+# Добавление кривых вложенных средств
+    plt.plot(data["Date"], np.interp(data["Date"], simple_monthly_totals["YearMonth"], simple_cumulative_investment),
+             label="Простая стратегия: Вложенные средства", color="blue", linestyle="--", alpha=0.5)
+    plt.plot(data["Date"], np.interp(data["Date"], test_monthly_totals["YearMonth"], test_cumulative_investment),
+             label="Тестируемая стратегия: Вложенные средства", color="orange", linestyle="--", alpha=0.5)
     plt.title("Динамика стоимости портфеля и пополнений")
     plt.xlabel("Дата")
     plt.ylabel("Доллары ($)")
@@ -132,8 +136,12 @@ def main():
     test_cagr = (1 + test_roi) ** (1 / ((datetime.fromisoformat(args.end_date) - datetime.fromisoformat(args.start_date)).days / 365)) - 1
 
     # Вывод результатов в консоль
-    print(f"\n=== Простая стратегия ===")
+    print(f"\n=== Входные данные ===")
+    print(f"Тикер: {args.ticker}")
     print(f"Сумма стандартного недельного пополнения: ${args.weekly_investment:.2f}")
+    print(f"Период: с {args.start_date} по {args.end_date}")
+
+    print(f"\n=== Простая стратегия ===")
     print(f"Общая сумма вложений: ${simple_invested:.2f}")
     print(f"Итоговая стоимость портфеля: ${simple_end_value:.2f}")
     print(f"Итоговая прибыль: ${simple_end_value - simple_invested:.2f}")
@@ -142,7 +150,7 @@ def main():
     print(f"CAGR: {simple_cagr * 100:.2f}%\n")
 
     print(f"=== Тестируемая стратегия ===")
-    print(f"Сумма стандартного недельного пополнения: ${args.weekly_investment:.2f}")
+    print(f"Множитель: {args.multiplier:.2f}")
     print(f"Общая сумма вложений: ${test_invested:.2f}")
     print(f"Итоговая стоимость портфеля: ${test_end_value:.2f}")
     print(f"Итоговая прибыль: ${test_end_value - test_invested:.2f}")

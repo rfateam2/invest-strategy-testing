@@ -1,0 +1,8 @@
+//@version=5
+strategy("Test Strategy", overlay=true)
+
+if (close > open)
+    strategy.entry("My Long Entry", strategy.long)
+
+if (close < open)
+    strategy.close("My Long Entry")

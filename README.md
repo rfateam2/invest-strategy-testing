@@ -100,3 +100,6 @@ python x.py 100 --start_date 2015-01-01 --end_date 2024-12-31 --ticker_1 QQQ --t
 - Количество акций QLD: 178.37, $91190.17, 25.95%
 - Количество акций TQQQ: 251.82, $128738.86, 36.63%
 ```
+
+![Alt text](res.png)
+<img src="res.png" width="300" />

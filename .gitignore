@@ -174,3 +174,4 @@ report.txt
 report_*
 
 *.csv
+strategy_state.json

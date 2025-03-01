@@ -14,7 +14,7 @@ python3 -m venv path/to/venv
 source path/to/venv/bin/activate
 pip install yfinance pandas numpy matplotlib ta
 
-python test-statagy.py 1000 \
+python investing.py 1000 \
     --start_date 2015-01-01 \
     --end_date 2024-12-31 \
     --ticker_1 QQQ \

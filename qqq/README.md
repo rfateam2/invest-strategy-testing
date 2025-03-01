@@ -75,16 +75,7 @@
 python3 -m venv path/to/venv                                                                                     
 source path/to/venv/bin/activate
 pip install yfinance pandas numpy matplotlib ta
-python investing.py 100 \
-    --start_date 2015-01-01 \
-    --end_date 2024-12-31 \
-    --ticker_1 QQQ \
-    --ticker_2 QLD \
-    --ticker_3 TQQQ \
-    --index QQQ \
-    --dropdown_1 0.10 \
-    --dropdown_2 0.20 \
-    --sell_threshold 0.10
+python investing.py 100 --start_date 2015-01-01 --end_date 2024-12-31 --ticker_1 QQQ --ticker_2 QLD --ticker_3 TQQQ --index QQQ --dropdown_1 0.10 --dropdown_2 0.20 --sell_threshold 0.10
 #Optional --skip_simple --skip_graf 
 ```
 

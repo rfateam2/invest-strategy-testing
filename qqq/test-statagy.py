@@ -14,7 +14,7 @@
 # --skip_simple: Пропустить выполнение простой стратегии (флаг).
 # --skip_graf: Пропустить отображение графика (флаг).
 
-# python x_rebalance.py 1000 --start_date 2015-01-01 --end_date 2024-12-31 --ticker_1 QQQ --ticker_2 QLD --ticker_3 TQQQ --index QQQ --dropdown_1 0.10 --dropdown_2 0.20 --sell_threshold 0.10 --skip_graf --skip_simple 
+# python test-statagy.py 1000 --start_date 2015-01-01 --end_date 2024-12-31 --ticker_1 QQQ --ticker_2 QLD --ticker_3 TQQQ --index QQQ --dropdown_1 0.10 --dropdown_2 0.20 --sell_threshold 0.10 --skip_graf --skip_simple 
 
 import argparse
 import os
